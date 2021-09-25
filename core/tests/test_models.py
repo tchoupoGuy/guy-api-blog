@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 from core import models
 
+
 def sample_user(email='test@guy.com', password='testpass'):
     """Create a sample user"""
     return get_user_model().objects.create_user(email, password)
@@ -43,7 +44,7 @@ class ModelTests(TestCase):
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
 
-    def test_article_str(self):
+    def test_tag_str(self):
         """Test the tag string representation"""
         tag = models.Tag.objects.create(
             user=sample_user(email='test@guyblog.com', password='testpass'),
@@ -51,3 +52,11 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(tag), tag.name)
+
+    def test_Article_str(self):
+        """Test the ingredient string representation"""
+        article = models.Article.objects.create(
+            user=sample_user(),
+            summarize='this is a good article'
+        )
+        self.assertEqual(str(article), article.summarize)
