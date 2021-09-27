@@ -59,3 +59,21 @@ class PrivateArticlesApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['summarize'], article.summarize)
+
+    def test_create_article_successful(self):
+        """test create a new article"""
+        payload = {'summarize': 'yes this the article'}
+        self.client.post(ARTICLES_URL, payload)
+
+        exists = Article.objects.filter(
+            user=self.user,
+            summarize=payload['summarize'],
+        ).exists()
+        self.assertTrue(exists)
+
+    def test_create_article_invalid(self):
+        """Test creating invalid article fails"""
+        payload = {'summarize': ''}
+        res = self.client.post(ARTICLES_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
