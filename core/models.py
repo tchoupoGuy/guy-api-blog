@@ -51,7 +51,7 @@ class Tag(models.Model):
 
 class Article(models.Model):
     """"Article in the recipe"""
-    summarize = models.CharField(max_length=500)
+    summarize = models.TextField(blank=True, null=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE

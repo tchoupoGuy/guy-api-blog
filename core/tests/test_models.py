@@ -60,3 +60,4 @@ class ModelTests(TestCase):
             summarize='this is a good article'
         )
         self.assertEqual(str(article), article.summarize)
+
