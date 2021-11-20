@@ -1,8 +1,14 @@
-from rest_framework import generics, authentication, permissions
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.settings import api_settings
+import json
 
-from user.serializers import UserSerializer, AuthTokenSerializer
+from django.contrib.auth.models import update_last_login
+from rest_framework import generics, authentication, permissions, status
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
+from rest_framework.views import APIView
+
+from user.serializers import UserSerializer, AuthTokenSerializer, LoginSerializers
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -27,12 +33,12 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-# class ManageUserView(generics.RetrieveUpdateAPIView):
-#     """Manage the authenticated user"""
-#     serializer_class = UserSerializer
-#     authentication_classes = (authentication.TokenAuthentication,)
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#     def get_object(self):
-#         """Retrieve and return authentication user"""
-#         return self.request.user
+class LoginAPIView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializers(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        update_last_login(None, user)
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({"Token": token.key, "email": user.email})
